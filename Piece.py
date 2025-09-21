@@ -8,11 +8,11 @@ class Piece:
     def __init__(self,img,color,role,x,y):
         self.color = color
         self.role = role
+        self.x = x
+        self.y = y
         self.img = pygame.transform.scale(img,(80,80))
-        self.x = x * cell_size + 10
-        self.y = y * cell_size + 10
         self.rect = self.img.get_rect()
-        self.rect.topleft = (self.x , self.y)
+        self.set_coordinate(self.x,self.y)
 
     # đặt lại tọa độ
     def set_coordinate(self,x,y):
