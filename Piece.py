@@ -5,7 +5,7 @@ class Piece:
     # img đã được load trước đó bằng pygame ở file main
     # role = pawn, bishop, knight, rook, queen, king
     # self là một quan co
-    def __init__(self,img,color,role,x,y,screen):
+    def __init__(self,img,color,role,x,y):
         self.color = color
         self.role = role
         self.x = x
