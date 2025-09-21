@@ -14,7 +14,7 @@ pygame.display.set_caption("CHESS_BOARD")
 
 # Board
 board = Board()
-board.Build_Board(screen)
+board.build_board(screen)
 
 # Black piece
 # Rook
@@ -93,6 +93,8 @@ while True :
     for pawn in piece_white_pawn:
         pawn.show_piece(screen)
     # ---------------------------------------
+    piece_white_LeftRook.set_coordinate(0,5)
+    piece_white_LeftRook.show_piece(screen)
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()

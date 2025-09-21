@@ -9,17 +9,18 @@ class Piece:
         self.color = color
         self.role = role
         self.img = pygame.transform.scale(img,(80,80))
-        self.x = x
-        self.y = y
-        self.img_rect = img.get_rect(topleft = (x * cell_size+10,y * cell_size+10))
+        self.x = x * cell_size + 10
+        self.y = y * cell_size + 10
+        self.rect = self.img.get_rect()
+        self.rect.topleft = (self.x , self.y)
 
     # đặt lại tọa độ
-    # def set_coordinate(self,x,y):
-    #     self.x = x
-    #     self.y = y
-    #     self.img.get_rect ()
-    #
+    def set_coordinate(self,x,y):
+        self.x = x * cell_size + 10
+        self.y = y * cell_size + 10
+        self.rect.topleft = (self.x, self.y)
+
     def show_piece(self,screen):
-        screen.blit(self.img,self.img_rect)
+        screen.blit(self.img,self.rect)
 
 
