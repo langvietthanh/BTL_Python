@@ -7,6 +7,7 @@ class Controller:
         self.board = board
         self.board_view = board_view
         self.selected_piece = None
+        self.valid_moves = []
 
     def handle_events(self, event):
         # Nhấn chuột xuống -> chọn quân
@@ -17,6 +18,7 @@ class Controller:
                     self.selected_piece = p
                     self.selected_piece.offset[0] = p.rect.x - mount_x
                     self.selected_piece.offset[1] = p.rect.y - mount_y
+                    self.selected_piece.set_valid_moves(self.board)
                     break
 
         # Kéo chuột -> di chuyển quân theo chuột
@@ -32,13 +34,26 @@ class Controller:
         # Thả chuột -> đặt quân vào ô
         elif event.type == pygame.MOUSEBUTTONUP:
             if self.selected_piece:
-                mount_x, mount_y = event.pos  # quân cờ đã được thả
+                # vị trí quân cờ được được thả
+                mount_x, mount_y = event.pos
+
                 # Chuyển tọa độ của chuột về tạo độ x, y là số nguyên chỉ nằm trong (0-7)
                 x = mount_x // cell_size
                 y = mount_y // cell_size
-                if (0 <= x < 8 and 0 <= y < 8):
-                    # Ô trong bàn cờ
-                    self.selected_piece.set_coordinate(x, y)
+
+                # Quân được thả vào ô hợp lệ
+                if [x,y] in self.selected_piece.valid_moves:
+                    # TH 1: Ăn quân
+                    if [x, y] in (self.board.all_coordinates_of_white + self.board.all_coordinates_of_black):
+                        deleted_piece = self.board.get_piece_with_coordinates(x,y)
+                        self.board.remove_piece(deleted_piece)
+                    # TH 2: Ô trống, do ô trống đã nằm trong valid_moves => x,y hợp lệ do đã kiểm tra ở trên
+
+                    # Đặt lại tọa độ cho quân có nước đi hợp lệ
+                    self.selected_piece.set_coordinate(x, y, self.board)
+
+                # Quân thả vào ô không hợp lệ => quay lại vị trí trước đó
                 else:
-                    self.selected_piece.set_coordinate(self.selected_piece.current_coordinates[0], self.selected_piece.current_coordinates[1])
+                    self.selected_piece.set_coordinate(self.selected_piece.current_coordinates[0], self.selected_piece.current_coordinates[1], self.board)
+                self.board.update_all_coordinates()
                 self.selected_piece = None
