@@ -1,27 +1,31 @@
 import pygame
 cell_size=100
 
+# role = pawn, bishop, knight, rook, queen, king
+# offset : khoảng cách tọa độ chuột với góc trên trái
+# current_coordinates : Tọa độ hiện tại của quân cờ
+# before_coordinates : Tọa độ trước đó của quân cờ
+
 class Piece:
-    # img đã được load trước đó bằng pygame ở file main
-    # role = pawn, bishop, knight, rook, queen, king
-    # self là một quan co
     def __init__(self,img,color,role,x,y):
         self.color = color
         self.role = role
-        self.x = x
-        self.y = y
-        self.img = pygame.transform.scale(img,(80,80))
-        self.rect = self.img.get_rect()
-        self.set_coordinate(self.x,self.y)
+        self.offset = [0,0]
+        self.current_coordinates = [x,y]
+        self.before_coordinates = [x,y]
+        self.img = pygame.transform.scale(img,(100,100))
+        self.rect = self.img.get_rect(topleft = (self.current_coordinates[0] * cell_size ,
+                                                 self.current_coordinates[1] * cell_size))
 
     # đặt lại tọa độ
     def set_coordinate(self,x,y):
-        self.x = x * cell_size + 10
-        self.y = y * cell_size + 10
-        self.rect.topleft = (self.x, self.y)
+        self.before_coordinates = self.current_coordinates
+        self.current_coordinates = [x,y]
+        self.set_rect()
 
-    def show_piece(self,screen):
-        screen.blit(self.img,self.rect)
+    def set_rect(self):
+        self.rect.x = self.current_coordinates[0] * cell_size
+        self.rect.y = self.current_coordinates[1] * cell_size
 
 
 
