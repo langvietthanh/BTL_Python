@@ -19,6 +19,7 @@ class Controller:
                     self.selected_piece.offset[0] = p.rect.x - mount_x
                     self.selected_piece.offset[1] = p.rect.y - mount_y
                     self.selected_piece.set_valid_moves(self.board)
+                    self.board.update_all_coordinates_eat(self.selected_piece)
                     break
 
         # Kéo chuột -> di chuyển quân theo chuột
@@ -44,16 +45,17 @@ class Controller:
                 # Quân được thả vào ô hợp lệ
                 if [x,y] in self.selected_piece.valid_moves:
                     # TH 1: Ăn quân
-                    if [x, y] in (self.board.all_coordinates_of_white + self.board.all_coordinates_of_black):
+                    if [x, y] in (self.board.current_coordinates_of_white + self.board.current_coordinates_of_black):
                         deleted_piece = self.board.get_piece_with_coordinates(x,y)
                         self.board.remove_piece(deleted_piece)
                     # TH 2: Ô trống, do ô trống đã nằm trong valid_moves => x,y hợp lệ do đã kiểm tra ở trên
 
                     # Đặt lại tọa độ cho quân có nước đi hợp lệ
-                    self.selected_piece.set_coordinate(x, y, self.board)
+                    self.selected_piece.set_coordinate(x, y)
 
                 # Quân thả vào ô không hợp lệ => quay lại vị trí trước đó
                 else:
-                    self.selected_piece.set_coordinate(self.selected_piece.current_coordinates[0], self.selected_piece.current_coordinates[1], self.board)
+                    self.selected_piece.set_coordinate(self.selected_piece.current_coordinates[0], self.selected_piece.current_coordinates[1])
                 self.board.update_all_coordinates()
+
                 self.selected_piece = None
