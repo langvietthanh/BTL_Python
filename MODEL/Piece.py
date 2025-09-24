@@ -19,7 +19,7 @@ class Piece:
         self.img = pygame.transform.scale(img,(100,100))
         self.rect = self.img.get_rect(topleft = (self.current_coordinates[0] * cell_size ,self.current_coordinates[1] * cell_size))
         self.valid_moves = []
-        self.can_replace = False
+        self.replaced_by = []
 
     # đặt lại tọa độ
     def set_coordinate(self,x,y):
@@ -64,18 +64,18 @@ class Piece:
                 # Nước đi khi có cơ hội ăn quân địch chéo
                 if future_coordinates[0] != self.current_coordinates[0]:
                     if self.color == 'Black':
-                        if board.cell_is_white_piece(future_coordinates[0], future_coordinates[1]):
+                        if board.cell_have_white_piece(future_coordinates[0], future_coordinates[1]):
                             self.valid_moves.append(future_coordinates)
-                        elif board.cell_is_black_piece(future_coordinates[0], future_coordinates[1]):
+                        elif board.cell_have_black_piece(future_coordinates[0], future_coordinates[1]):
                             piece = board.get_piece_with_coordinates(future_coordinates[0],future_coordinates[1])
-                            piece.can_replace = True
+                            piece.replaced_by.append(self)
 
                     if self.color == 'White':
-                        if board.cell_is_black_piece(future_coordinates[0], future_coordinates[1]):
+                        if board.cell_have_black_piece(future_coordinates[0], future_coordinates[1]):
                             self.valid_moves.append(future_coordinates)
-                        elif board.cell_is_white_piece(future_coordinates[0], future_coordinates[1]):
+                        elif board.cell_have_white_piece(future_coordinates[0], future_coordinates[1]):
                             piece = board.get_piece_with_coordinates(future_coordinates[0], future_coordinates[1])
-                            piece.can_replace = True
+                            piece.replaced_by.append(self)
 
                 # Ô trước phải trống => future_coordinates không nằm trong tọa độ hiện tại của các quân có trên bàn cờ
                 elif board.cell_is_empty(future_coordinates[0], future_coordinates[1]):
@@ -87,21 +87,21 @@ class Piece:
             x, y = self.current_coordinates[0] + step[0], self.current_coordinates[1] + step[1]
             while 0 <= x <= 7 and 0 <= y <= 7:
                 if self.color == 'White':
-                    if board.cell_is_black_piece(x, y):
+                    if board.cell_have_black_piece(x, y):
                         self.valid_moves.append([x, y])
                         break
-                    elif board.cell_is_white_piece(x, y):
+                    elif board.cell_have_white_piece(x, y):
                         piece = board.get_piece_with_coordinates(x,y)
-                        piece.can_replace = True
+                        piece.replaced_by.append(self)
                         break
 
                 if self.color == 'Black':
-                    if board.cell_is_white_piece(x, y):
+                    if board.cell_have_white_piece(x, y):
                         self.valid_moves.append([x, y])
                         break
-                    elif board.cell_is_black_piece(x, y):
+                    elif board.cell_have_black_piece(x, y):
                         piece = board.get_piece_with_coordinates(x, y)
-                        piece.can_replace = True
+                        piece.replaced_by.append(self)
                         break
 
                 if board.cell_is_empty(x, y):
@@ -118,21 +118,21 @@ class Piece:
                 # Nước đi khi có cơ hội ăn quân địch
                 if self.color == 'Black':
 
-                    if board.cell_is_white_piece(future_coordinates[0], future_coordinates[1]):
+                    if board.cell_have_white_piece(future_coordinates[0], future_coordinates[1]):
                         self.valid_moves.append(future_coordinates)
 
-                    elif board.cell_is_black_piece(future_coordinates[0], future_coordinates[1]):
+                    elif board.cell_have_black_piece(future_coordinates[0], future_coordinates[1]):
                         piece = board.get_piece_with_coordinates(future_coordinates[0], future_coordinates[1])
-                        piece.can_replace = True
+                        piece.replaced_by.append(self)
                     
                 elif self.color == 'White':
 
-                    if board.cell_is_black_piece(future_coordinates[0], future_coordinates[1]):
+                    if board.cell_have_black_piece(future_coordinates[0], future_coordinates[1]):
                         self.valid_moves.append(future_coordinates)
 
-                    elif board.cell_is_white_piece(future_coordinates[0], future_coordinates[1]):
+                    elif board.cell_have_white_piece(future_coordinates[0], future_coordinates[1]):
                         piece = board.get_piece_with_coordinates(future_coordinates[0], future_coordinates[1])
-                        piece.can_replace = True
+                        piece.replaced_by.append(self)
                     
                 # Ô trước phải trống => future_coordinates không nằm trong tọa độ hiện tại của các quân có trên bàn cờ
                 if board.cell_is_empty(future_coordinates[0], future_coordinates[1]):
@@ -145,22 +145,22 @@ class Piece:
 
             while 0 <= x <= 7 and 0 <= y <= 7 :
                 if self.color == 'White':
-                    if board.cell_is_black_piece(x, y):
+                    if board.cell_have_black_piece(x, y):
                         self.valid_moves.append([x,y])
                         break
-                    elif board.cell_is_white_piece(x, y):
+                    elif board.cell_have_white_piece(x, y):
                         piece = board.get_piece_with_coordinates(x, y)
-                        piece.can_replace = True
+                        piece.replaced_by.append(self)
                         break
 
                 if self.color == 'Black':
 
-                    if board.cell_is_white_piece(x, y):
+                    if board.cell_have_white_piece(x, y):
                         self.valid_moves.append([x, y])
                         break
-                    elif board.cell_is_black_piece(x, y):
+                    elif board.cell_have_black_piece(x, y):
                         piece = board.get_piece_with_coordinates(x, y)
-                        piece.can_replace = True
+                        piece.replaced_by.append(self)
                         break
 
                 if board.cell_is_empty(x, y):
@@ -176,25 +176,24 @@ class Piece:
     def set_king_moves(self, board):
         king_valid_steps = [[x, y] for x in range(-1, 2) for y in range(-1, 2) if (x != 0 or y != 0)]
         for step in king_valid_steps:
-
             future_coordinates = [step[0] + self.current_coordinates[0], step[1] + self.current_coordinates[1]]
-
-            if 0 <= future_coordinates[0] <= 7 and 0 <= future_coordinates[1] <= 7:
+            if (0 <= future_coordinates[0] <= 7) and (0 <= future_coordinates[1] <= 7):
                 # Nước đi khi có cơ hội ăn quân địch chéo
                 if self.color == 'Black':
-                    if board.cell_is_white_piece(future_coordinates[0], future_coordinates[1]):
+                    if board.cell_have_white_piece(future_coordinates[0], future_coordinates[1]):
                         piece = board.get_piece_with_coordinates(future_coordinates[0], future_coordinates[1])
-                        if not piece.can_replace :
+                        if piece.replaced_by.size == 0:
                             self.valid_moves.append(future_coordinates)
 
                 if self.color == 'White':
-                    if board.cell_is_black_piece(future_coordinates[0], future_coordinates[1]):
+                    if board.cell_have_black_piece(future_coordinates[0], future_coordinates[1]):
                         piece = board.get_piece_with_coordinates(future_coordinates[0], future_coordinates[1])
-                        if not piece.can_replace:
+                        if piece.replaced_by.size == 0 :
                             self.valid_moves.append(future_coordinates)
 
                 # Ô trước phải trống => future_coordinates không nằm trong tọa độ hiện tại của các quân có trên bàn cờ
-                elif board.cell_is_empty(future_coordinates[0], future_coordinates[1]) and future_coordinates not in board.coordinates_can_replace:
-                    self.valid_moves.append(future_coordinates)
+                # predict_moves được tính từ lúc ấn vào king
+                if board.cell_is_empty(future_coordinates[0], future_coordinates[1]) and (tuple(future_coordinates) not in board.predict_moves):
+                   self.valid_moves.append(future_coordinates)
 
 

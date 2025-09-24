@@ -19,7 +19,7 @@ class Controller:
                     self.selected_piece.offset[0] = p.rect.x - mount_x
                     self.selected_piece.offset[1] = p.rect.y - mount_y
                     self.selected_piece.set_valid_moves(self.board)
-                    self.board.update_all_coordinates_eat(self.selected_piece)
+                    self.board.update_predict_moves(self.selected_piece)
                     break
 
         # Kéo chuột -> di chuyển quân theo chuột
@@ -56,6 +56,7 @@ class Controller:
                 # Quân thả vào ô không hợp lệ => quay lại vị trí trước đó
                 else:
                     self.selected_piece.set_coordinate(self.selected_piece.current_coordinates[0], self.selected_piece.current_coordinates[1])
+
                 self.board.update_all_coordinates()
 
                 self.selected_piece = None
