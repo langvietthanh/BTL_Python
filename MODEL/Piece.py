@@ -23,6 +23,10 @@ class Piece:
 
     # đặt lại tọa độ
     def set_coordinate(self,x,y):
+        # chỉ set lại tọa độ khi thực sự di chuyển quân
+        if [x, y] == self.current_coordinates:
+            self.set_rect()
+            return
         self.before_coordinates = self.current_coordinates
         self.current_coordinates = [x,y]
         self.set_rect()
@@ -54,32 +58,33 @@ class Piece:
 
     def set_pawn_moves(self,board):
         pawn_steps = [[0, 1], [1, 1], [-1, 1]]
+        if self.current_coordinates == self.before_coordinates : pawn_steps.append([0,2])
         for step in pawn_steps:
             if self.color == 'Black':
-                future_coordinates = [step[0] + self.current_coordinates[0], step[1] + self.current_coordinates[1]]
+                next_move = [step[0] + self.current_coordinates[0], step[1] + self.current_coordinates[1]]
             else :
-                future_coordinates = [-step[0] + self.current_coordinates[0], -step[1] + self.current_coordinates[1]]
+                next_move = [-step[0] + self.current_coordinates[0], -step[1] + self.current_coordinates[1]]
 
-            if 0 <= future_coordinates[0] <= 7 and 0 <= future_coordinates[1] <= 7 :
+            if 0 <= next_move[0] <= 7 and 0 <= next_move[1] <= 7 :
                 # Nước đi khi có cơ hội ăn quân địch chéo
-                if future_coordinates[0] != self.current_coordinates[0]:
+                if next_move[0] != self.current_coordinates[0]:
                     if self.color == 'Black':
-                        if board.cell_have_white_piece(future_coordinates[0], future_coordinates[1]):
-                            self.valid_moves.append(future_coordinates)
-                        elif board.cell_have_black_piece(future_coordinates[0], future_coordinates[1]):
-                            piece = board.get_piece_with_coordinates(future_coordinates[0],future_coordinates[1])
+                        if board.cell_have_white_piece(next_move[0], next_move[1]):
+                            self.valid_moves.append(next_move)
+                        elif board.cell_have_black_piece(next_move[0], next_move[1]):
+                            piece = board.get_piece_with_coordinates(next_move[0],next_move[1])
                             piece.replaced_by.append(self)
 
                     if self.color == 'White':
-                        if board.cell_have_black_piece(future_coordinates[0], future_coordinates[1]):
-                            self.valid_moves.append(future_coordinates)
-                        elif board.cell_have_white_piece(future_coordinates[0], future_coordinates[1]):
-                            piece = board.get_piece_with_coordinates(future_coordinates[0], future_coordinates[1])
+                        if board.cell_have_black_piece(next_move[0], next_move[1]):
+                            self.valid_moves.append(next_move)
+                        elif board.cell_have_white_piece(next_move[0], next_move[1]):
+                            piece = board.get_piece_with_coordinates(next_move[0], next_move[1])
                             piece.replaced_by.append(self)
 
-                # Ô trước phải trống => future_coordinates không nằm trong tọa độ hiện tại của các quân có trên bàn cờ
-                elif board.cell_is_empty(future_coordinates[0], future_coordinates[1]):
-                    self.valid_moves.append(future_coordinates)
+                # Ô trước phải trống => next_move không nằm trong tọa độ hiện tại của các quân có trên bàn cờ
+                elif board.cell_is_empty(next_move[0], next_move[1]):
+                    self.valid_moves.append(next_move)
 
     def set_rook_moves(self, board):
         rook_steps = [[1, 0], [-1, 0], [0, 1], [0, -1]]
@@ -112,31 +117,31 @@ class Piece:
     def set_knight_moves(self, board) :
         knight_steps = [[1, 2], [1, -2], [2, 1], [2, -1], [-1, 2], [-1, -2], [-2, 1], [-2, -1]]
         for step in knight_steps:
-            future_coordinates = [step[0] + self.current_coordinates[0], step[1] + self.current_coordinates[1]]
+            next_move = [step[0] + self.current_coordinates[0], step[1] + self.current_coordinates[1]]
 
-            if 0 <= future_coordinates[0] <= 7 and 0 <= future_coordinates[1] <= 7 :
+            if 0 <= next_move[0] <= 7 and 0 <= next_move[1] <= 7 :
                 # Nước đi khi có cơ hội ăn quân địch
                 if self.color == 'Black':
 
-                    if board.cell_have_white_piece(future_coordinates[0], future_coordinates[1]):
-                        self.valid_moves.append(future_coordinates)
+                    if board.cell_have_white_piece(next_move[0], next_move[1]):
+                        self.valid_moves.append(next_move)
 
-                    elif board.cell_have_black_piece(future_coordinates[0], future_coordinates[1]):
-                        piece = board.get_piece_with_coordinates(future_coordinates[0], future_coordinates[1])
+                    elif board.cell_have_black_piece(next_move[0], next_move[1]):
+                        piece = board.get_piece_with_coordinates(next_move[0], next_move[1])
                         piece.replaced_by.append(self)
                     
                 elif self.color == 'White':
 
-                    if board.cell_have_black_piece(future_coordinates[0], future_coordinates[1]):
-                        self.valid_moves.append(future_coordinates)
+                    if board.cell_have_black_piece(next_move[0], next_move[1]):
+                        self.valid_moves.append(next_move)
 
-                    elif board.cell_have_white_piece(future_coordinates[0], future_coordinates[1]):
-                        piece = board.get_piece_with_coordinates(future_coordinates[0], future_coordinates[1])
+                    elif board.cell_have_white_piece(next_move[0], next_move[1]):
+                        piece = board.get_piece_with_coordinates(next_move[0], next_move[1])
                         piece.replaced_by.append(self)
                     
-                # Ô trước phải trống => future_coordinates không nằm trong tọa độ hiện tại của các quân có trên bàn cờ
-                if board.cell_is_empty(future_coordinates[0], future_coordinates[1]):
-                    self.valid_moves.append(future_coordinates)
+                # Ô trước phải trống => next_move không nằm trong tọa độ hiện tại của các quân có trên bàn cờ
+                if board.cell_is_empty(next_move[0], next_move[1]):
+                    self.valid_moves.append(next_move)
 
     def set_bishop_moves(self, board):
         bishop_steps = [[1,1],[-1,-1],[-1,1],[1,-1]]
@@ -173,27 +178,46 @@ class Piece:
         self.set_bishop_moves(board)
         self.set_rook_moves(board)
 
+    def set_pawn_moves_case_king(self, board, predict_move):
+        pawn_steps = [[1, 1], [-1, 1]]
+        for step in pawn_steps:
+            if self.color == 'Black':
+                next_move = [step[0] + self.current_coordinates[0], step[1] + self.current_coordinates[1]]
+            else:
+                next_move = [-step[0] + self.current_coordinates[0], -step[1] + self.current_coordinates[1]]
+            if 0 <= next_move[0] <= 7 and 0 <= next_move[1] <= 7:
+                # Nước đi khi có cơ hội ăn vua địch (chéo)
+                piece = board.get_piece_with_coordinates(next_move[0], next_move[1])
+                if piece is None:
+                    predict_move.append(next_move)
+
     def set_king_moves(self, board):
         king_valid_steps = [[x, y] for x in range(-1, 2) for y in range(-1, 2) if (x != 0 or y != 0)]
+        warning_moves = board.predict_moves
+
         for step in king_valid_steps:
-            future_coordinates = [step[0] + self.current_coordinates[0], step[1] + self.current_coordinates[1]]
-            if (0 <= future_coordinates[0] <= 7) and (0 <= future_coordinates[1] <= 7):
+            next_move = [step[0] + self.current_coordinates[0], step[1] + self.current_coordinates[1]]
+            if (0 <= next_move[0] <= 7) and (0 <= next_move[1] <= 7):
+                piece = board.get_piece_with_coordinates(next_move[0], next_move[1])
                 # Nước đi khi có cơ hội ăn quân địch chéo
-                if self.color == 'Black':
-                    if board.cell_have_white_piece(future_coordinates[0], future_coordinates[1]):
-                        piece = board.get_piece_with_coordinates(future_coordinates[0], future_coordinates[1])
-                        if piece.replaced_by.size == 0:
-                            self.valid_moves.append(future_coordinates)
+                if None != piece:
+                    if self.color == 'Black':
+                        if board.cell_have_white_piece(next_move[0], next_move[1]) and len(piece.replaced_by) == 0:
+                            self.valid_moves.append(next_move)
+                        elif board.cell_have_black_piece(next_move[0], next_move[1]):
+                            piece.replaced_by.append(self)
 
-                if self.color == 'White':
-                    if board.cell_have_black_piece(future_coordinates[0], future_coordinates[1]):
-                        piece = board.get_piece_with_coordinates(future_coordinates[0], future_coordinates[1])
-                        if piece.replaced_by.size == 0 :
-                            self.valid_moves.append(future_coordinates)
+                    if self.color == 'White':
+                        if board.cell_have_black_piece(next_move[0], next_move[1]) and len(piece.replaced_by) == 0 :
+                            self.valid_moves.append(next_move)
+                        elif board.cell_have_white_piece(next_move[0], next_move[1]):
+                            piece.replaced_by.append(self)
 
-                # Ô trước phải trống => future_coordinates không nằm trong tọa độ hiện tại của các quân có trên bàn cờ
-                # predict_moves được tính từ lúc ấn vào king
-                if board.cell_is_empty(future_coordinates[0], future_coordinates[1]) and (tuple(future_coordinates) not in board.predict_moves):
-                   self.valid_moves.append(future_coordinates)
+                # warning_moves được tính từ lúc ấn vào king
+                elif next_move not in warning_moves:
+                    self.valid_moves.append(next_move)
+
+    def had_move(self):
+        return self.current_coordinates != self.before_coordinates
 
 

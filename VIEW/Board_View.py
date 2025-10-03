@@ -4,13 +4,17 @@ from MODEL.Piece import *
 # Color for cell
 WHITE = (238, 238, 210)
 DARKGREEN = (118, 150, 86)
+LIGHTBLUE = (173, 216, 230, 200)
+DARKBLUE = (30, 144, 255, 200)
+LIGHTRED = (255, 99, 71)
 cell_size = 100
 # -------------------------------------------------------------------------------------------
 
 class Board_View:
-    def __init__(self,screen,board):
+    def __init__(self,screen, board):
         self.screen = screen
         self.board = board
+        self.selected_piece = None
 
     def init_piece(self):
         # Black piece
@@ -88,11 +92,46 @@ class Board_View:
         for Pawn in piece_white_pawn:
             self.board.add_piece(Pawn)
 
-    def draw(self):
+    def draw_board(self):
+        if self.selected_piece : self.draw_current_board()
+        else : self.draw_blank_board()
+
+    def draw_current_board(self):
+        valid_moves = []
+        selected_piece = self.selected_piece
+        if selected_piece:valid_moves = selected_piece.valid_moves
+        for r in range(8):
+            for c in range(8):
+                if [r,c] in valid_moves:
+                    if self.board.cell_is_empty(r,c) : self.draw_empty_cell(r,c)
+                    else :
+                        piece = self.board.get_piece_with_coordinates(r,c)
+                        if piece.role != 'king':
+                            self.draw_piece_cell(r,c)
+                        else :
+                            self.draw_king_check(r,c)
+                else:
+                    color = WHITE if (r + c) % 2 == 0 else DARKGREEN
+                    pygame.draw.rect(self.screen, color, (r * cell_size, c * cell_size, cell_size, cell_size))
+        self.draw_pieces()
+
+    def draw_blank_board(self):
         for r in range(8):
             for c in range(8):
                 color = WHITE if (r + c) % 2 == 0 else DARKGREEN
                 pygame.draw.rect(self.screen, color, (r * cell_size, c * cell_size, cell_size, cell_size))
+        self.draw_pieces()
+
+    def draw_pieces(self):
         for p in self.board.pieces:
             self.screen.blit(p.img, p.rect)
         pg.display.flip()
+
+    def draw_empty_cell(self,r,c):
+        pygame.draw.rect(self.screen, LIGHTBLUE, (r * cell_size, c * cell_size, cell_size, cell_size))
+
+    def draw_piece_cell(self,r,c):
+        pygame.draw.rect(self.screen, DARKBLUE, (r * cell_size, c * cell_size, cell_size, cell_size))
+
+    def draw_king_check(self, r, c):
+        pygame.draw.rect(self.screen, LIGHTRED, (r * cell_size, c * cell_size, cell_size, cell_size))

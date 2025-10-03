@@ -2,6 +2,7 @@ import pygame as pg
 from MODEL.Piece import *
 from MODEL.Chess_Board import *
 
+
 class Controller:
     def __init__(self, board, board_view):
         self.board = board
@@ -12,14 +13,20 @@ class Controller:
     def handle_events(self, event):
         # Nhấn chuột xuống -> chọn quân
         if event.type == pygame.MOUSEBUTTONDOWN:
+            flip = False
             mount_x, mount_y = event.pos
             for p in self.board.pieces:
                 if p.rect.collidepoint(mount_x, mount_y):
-                    self.selected_piece = p
+                    self.selected_piece = self.board_view.selected_piece = p
+
                     self.selected_piece.offset[0] = p.rect.x - mount_x
                     self.selected_piece.offset[1] = p.rect.y - mount_y
-                    self.selected_piece.set_valid_moves(self.board)
+
+                    self.board.update_all_coordinates()
+                    # update_predict_moves chỉ áp dụng cho quân vua
                     self.board.update_predict_moves(self.selected_piece)
+                    self.selected_piece.set_valid_moves(self.board)
+                    flip = True
                     break
 
         # Kéo chuột -> di chuyển quân theo chuột
@@ -57,6 +64,7 @@ class Controller:
                 else:
                     self.selected_piece.set_coordinate(self.selected_piece.current_coordinates[0], self.selected_piece.current_coordinates[1])
 
-                self.board.update_all_coordinates()
-
+                self.board_view.selected_piece = None
                 self.selected_piece = None
+
+

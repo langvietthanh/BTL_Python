@@ -10,7 +10,7 @@ class Board:
         self.pieces = []
         self.current_coordinates_of_black = []
         self.current_coordinates_of_white = []
-        self.predict_moves = set()
+        self.predict_moves = []
 
     def get_piece_with_coordinates(self,x,y):
         for piece in self.pieces:
@@ -29,7 +29,6 @@ class Board:
     def update_all_coordinates(self):
         self.current_coordinates_of_black = []
         self.current_coordinates_of_white = []
-        self.predict_moves = set()
         for piece in self.pieces:
             if piece.color == 'Black':
                 self.current_coordinates_of_black.append(piece.current_coordinates)
@@ -37,12 +36,18 @@ class Board:
                 self.current_coordinates_of_white.append(piece.current_coordinates)
 
     def update_predict_moves(self, selected_piece):
-        self.predict_moves = set()
         if selected_piece.role == 'king':
+            self.predict_moves = []
             for piece in self.pieces:
                 if selected_piece.color != piece.color :
-                    piece.set_valid_moves(self)
-                    self.predict_moves.update(map(tuple,piece.valid_moves))
+                    if piece.role != 'pawn':
+                        piece.set_valid_moves(self)
+                        self.predict_moves += piece.valid_moves
+
+                    else :
+                        predict_move = []
+                        piece.set_pawn_moves_case_king(self, predict_move)
+                        self.predict_moves += predict_move
 
     def cell_have_white_piece(self, x, y):
         return [x,y] in self.current_coordinates_of_white

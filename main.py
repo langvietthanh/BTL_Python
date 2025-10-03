@@ -29,5 +29,5 @@ while running :
             running = False
         else:
             Controller.handle_events(event)
-    board_view.draw()
+    board_view.draw_board()
 pygame.quit()
