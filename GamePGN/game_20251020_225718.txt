@@ -1,0 +1,9 @@
+[Event "Chess Game"]
+[Site "Chess AI Game"]
+[Date "2025.10.20"]
+[Round "1"]
+[White "Player"]
+[Black "AI"]
+[Result "1/2-1/2"]
+
+ 1/2-1/2
