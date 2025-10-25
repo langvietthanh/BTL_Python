@@ -226,3 +226,4 @@ class Board_View :
         if self .board_rotated :
             return (7 -x ,7 -y )
         return (x ,y )
+
